@@ -1,15 +1,37 @@
 var createError = require('http-errors');
+var http = require('http');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose');
-var cors = require('cors')
+var cors = require('cors');
+const socketio = require('socket.io');
 
 //import all routers
 var indexRouter = require('./routes/index');
+var userRouter = require('./routes/user');
+
+//import all utils
+const { generateMessage, generateLocationMessage } = require('./utils/messages');
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users');
 
 var app = express();
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = process.env.PORT || '8000';
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+server.listen(port, () => console.log('API started on port', port));
 
 //for desabling cors issue on frontend
 app.use(cors());
@@ -20,13 +42,70 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const io = socketio(server);
+
 //mongodb connection
 mongoose.connect('mongodb://dbansal18:dbansal18@ds141434.mlab.com:41434/famecaredb',{ useCreateIndex: true, useNewUrlParser: true, useFindAndModify: false}, () => {
     console.log('connected to mongodb');
 });
 
 //use routers on routes
-app.use('/', indexRouter);
+app.use('/api', indexRouter);
+app.use('/user', userRouter);
+
+io.on('connection', (socket) => {
+    console.log('New WebSocket connection')
+
+    socket.on('join', (options, callback) => {
+        // console.log('se', JSON.parse(options))
+        const { error, user } = addUser({ id: socket.id, ...JSON.parse(options) })
+
+        if (error) {
+            return callback(error)
+        }
+
+        socket.join(user.room)
+
+        socket.emit('message', generateMessage('Admin', 'Welcome!'))
+        socket.broadcast.to(user.room).emit('message', generateMessage('Admin', `${user.username} has joined!`))
+        io.to(user.room).emit('roomData', {
+            room: user.room,
+            users: getUsersInRoom(user.room)
+        })
+
+        callback()
+    })
+
+    socket.on('sendMessage', (message, callback) => {
+        const user = getUser(socket.id)
+        const filter = new Filter()
+
+        if (filter.isProfane(message)) {
+            return callback('Profanity is not allowed!')
+        }
+
+        io.to(user.room).emit('message', generateMessage(user.username, message))
+        callback()
+    })
+
+    socket.on('sendLocation', (coords, callback) => {
+        const user = getUser(socket.id)
+        io.to(user.room).emit('locationMessage', generateLocationMessage(user.username, `https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
+        callback()
+    })
+
+    socket.on('disconnect', () => {
+        const user = removeUser(socket.id)
+
+        if (user) {
+            io.to(user.room).emit('message', generateMessage('Admin', `${user.username} has left!`))
+            io.to(user.room).emit('roomData', {
+                room: user.room,
+                users: getUsersInRoom(user.room)
+            })
+        }
+    })
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -40,8 +119,7 @@ app.use(function(err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  res.status(err.status || 500).json({message: 'Error'});
 });
 
 module.exports = app;
