@@ -11,6 +11,7 @@ const socketio = require('socket.io');
 //import all routers
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
+var groupRouter = require('./routes/group');
 
 //import all utils
 const { generateMessage, generateLocationMessage } = require('./utils/messages');
@@ -52,6 +53,7 @@ mongoose.connect('mongodb://dbansal18:dbansal18@ds141434.mlab.com:41434/famecare
 //use routers on routes
 app.use('/api', indexRouter);
 app.use('/user', userRouter);
+app.use('/group', groupRouter);
 
 io.on('connection', (socket) => {
     console.log('New WebSocket connection')

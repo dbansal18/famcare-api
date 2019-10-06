@@ -2,10 +2,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const groupSchema = new Schema({
-    groupid: {type: Number, required: true, unique: true},
-    name: {type: String, required: true},
+    name: {type: String, required: true, unique: true},
     thumbnail: String,
-    users: [{name: String, id: String}],
+    users: [{name: String, id: String, isAdmin: Boolean}],
 });
 
 const Group = mongoose.model('group', groupSchema);
