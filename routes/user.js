@@ -25,9 +25,13 @@ router.post('/signin', (req, res, next) => {
 	  // If request specified a G Suite domain:
 	  //const domain = payload['hd'];
 	  if(CLIENT_ID == payload.aud) {
-	  	User.findOne({email: payload.email}, { authCode: 0, userid: 0 }).then((user, err) => {
+	  	User.findOne({email: payload.email}).then((user, err) => {
 	  		if(err) res.status(404).json(err);
-	  		if(user) res.status(200).json(user);
+	  		if(user) {
+	  			user.authCode = idtoken;
+	  			user.save().then((loggedUser) => res.status(200).json(loggedUser))
+	  					.catch((err) => res.sendStatus(401))
+	  		}
 	  		else {
 	  			new User({
 	  				userid: payload.sub,
