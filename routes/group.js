@@ -17,7 +17,7 @@ router.get('/', headerCheck, (req, res, next) => {
 			Group.find().then((groups) => {
 				res.send(groups);
 			}).catch((err) => res.status(404).json(err));
-		})
+		}).catch((err) => res.status(401).json({messsage: 'Unauthorized'}));
 })
 
 router.post('/', headerCheck, (req, res, next) => {
