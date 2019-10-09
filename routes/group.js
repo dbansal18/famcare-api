@@ -48,13 +48,13 @@ router.post('/invite', headerCheck, (req, res) => {
 				Group.findOne({_id: req.body.group}, (err, group) => {
 					if(err) res.status(403).json({error: err});
 					if(group) {
-						if(group.admin === user._id) {
+						if(group.admin == user._id) {
 							User.findOne({email: req.body.email}, (err, invitedUser) => {
 								if(err) res.status(404).json({messsage: err});
 								if(invitedUser) {
 									group.users.push({name: invitedUser.name, id: invitedUser._id, isAdmin: 0});
 									group.save().then((updatedGroup) => {
-										invitedUser.groups({id: updatedGroup._id, name: updatedGroup.name});
+										invitedUser.groups.push({id: updatedGroup._id, name: updatedGroup.name});
 										invitedUser.save().then((updatedUser) => res.send({group: updatedGroup}));
 									})
 								}
