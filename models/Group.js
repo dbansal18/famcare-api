@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const groupSchema = new Schema({
     name: {type: String, required: true, unique: true},
     thumbnail: String,
+    admin: String,
     users: [{name: String, id: String, isAdmin: Boolean}],
 });
 
