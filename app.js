@@ -46,7 +46,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const io = socketio(server);
 
 //mongodb connection
-mongoose.connect('mongodb://dbansal18:dbansal18@ds141434.mlab.com:41434/famecaredb',{ useCreateIndex: true, useNewUrlParser: true, useFindAndModify: false}, () => {
+mongoose.connect('mongodb://dbansal18:dbansal18@ds141434.mlab.com:41434/famecaredb',{ useCreateIndex: true, useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true}, () => {
     console.log('connected to mongodb');
 });
 

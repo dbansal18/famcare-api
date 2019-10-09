@@ -26,6 +26,7 @@ router.post('/', headerCheck, (req, res, next) => {
 				new Group({
 				    name: req.body.groupName,
 				    thumbnail: req.body.image,
+				    admin: user._id,
 				    users: [{name: user.name, id: user._id, isAdmin: 1}],
 				}).save().then((group) => {
 					user.groups.push({id: group._id, name: group.name})
@@ -38,5 +39,30 @@ router.post('/', headerCheck, (req, res, next) => {
 				console.log('1', err)
 			});
 });
+
+router.post('/invite', headerCheck, (req, res) => {
+	if(!req.body.email || !req.body.group) res.status(403).json({messsage: 'Fill all the required details'});
+	else
+		authUser(req.headers.authorization)
+			.then((user) => {
+				Group.findOne({_id: req.body.group}, (err, group) => {
+					if(err) res.status(403).json({error: err});
+					if(group) {
+						if(group.admin === user._id) {
+							User.findOne({email: req.body.email}, (err, invitedUser) => {
+								if(err) res.status(404).json({messsage: err});
+								if(invitedUser) {
+									group.users.push({name: invitedUser.name, id: invitedUser._id, isAdmin: 0});
+									group.save().then((updatedGroup) => {
+										invitedUser.groups({id: updatedGroup._id, name: updatedGroup.name});
+										invitedUser.save().then((updatedUser) => res.send({group: updatedGroup}));
+									})
+								}
+							})
+						} else res.status(401).json({messsage: 'You are not admin of this group'});
+					}
+				})
+			})
+})
 
 module.exports = router;
