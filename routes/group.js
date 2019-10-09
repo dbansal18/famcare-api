@@ -4,8 +4,6 @@ const authUser = require('./../utils/auth');
 const Group = require('./../models/Group');
 const User = require('./../models/User');
 
-var groupid = 0;
-
 const headerCheck = (req, res, next) => {
 	if(req.headers.authorization) next();
 	else res.status(401).json({messsage: 'Authorization headers are not present'});
@@ -21,7 +19,7 @@ router.get('/', headerCheck, (req, res, next) => {
 })
 
 router.post('/', headerCheck, (req, res, next) => {
-	if(!req.body.groupName || !req.body.image) res.status(403).json({messsage: 'Fill group name and image'});
+	if(!req.body.groupName) res.status(403).json({messsage: 'Fill group name'});
 	else
 		authUser(req.headers.authorization)
 			.then((user) => {
