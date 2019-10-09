@@ -6,7 +6,7 @@ const {OAuth2Client} = require('google-auth-library');
 /* GET home page. */
 router.get('/', function(req, res, next) {
   User.find({}, {email: 1}).then((users) => {
-  	console.log(users);
+  	res.send(users);
   })
 });
 
