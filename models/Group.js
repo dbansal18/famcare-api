@@ -5,7 +5,7 @@ const groupSchema = new Schema({
     name: {type: String, required: true, unique: true},
     thumbnail: String,
     admin: String,
-    users: [{name: String, id: String, isAdmin: Boolean}],
+    users: [{name: String, id: String, email: String, isAdmin: Boolean}],
 });
 
 const Group = mongoose.model('group', groupSchema);
