@@ -1,20 +1,42 @@
-const generateMessage = (username, text) => {
+const userLocations = [];
+
+// const generateMessage = (username, text) => {
+//     return {
+//         username,
+//         text,
+//         createdAt: new Date().getTime()
+//     }
+// }
+
+const generateLocationMessage = (username, coords) => {
+    coords.createdAt = new Date()
     return {
         username,
-        text,
-        createdAt: new Date().getTime()
+        coords,
     }
 }
 
-const generateLocationMessage = (username, url) => {
-    return {
-        username,
-        url,
-        createdAt: new Date().getTime()
+const addUserLocation = (userLoc) => {
+    if(!userLoc) return;
+    var userLoca = {
+        username: userLoc.username,
+        coords: {
+            lat: userLoc.lat,
+            lon: userLoc.lon,
+            createdAt: userLoc.createdAt,
+        }
     }
+    const user = userLocations.find(location => userLoc.username == location.username ? 
+      location.coords = userLoca.coords : '');
+    if(!user) userLocations.push(userLoca);
+}
+
+const getUserLocations = () => {
+    return userLocations;
 }
 
 module.exports = {
-    generateMessage,
+    getUserLocations,
+    addUserLocation,
     generateLocationMessage
 }
