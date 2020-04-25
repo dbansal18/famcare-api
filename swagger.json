@@ -1,0 +1,485 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is Swwagger API Documentation for `Famcare Api`. Send your Google idToken as your Authorization headers to access the APIs.",
+    "version": "1.0.0",
+    "title": "Famcare",
+    "contact": {
+      "email": "bdeepanshu18@yahoo.com"
+    }
+  },
+  "host": "famcare-api.herokuapp.com",
+  "tags": [
+    {
+      "name": "user"
+    },
+    {
+      "name": "group"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/user": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get all user emails",
+        "description": "Get all user emails",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "description": "The user ID."
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "The user email."
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/signin": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Logs or Sign user into the system",
+        "description": "",
+        "operationId": "loginUser",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User loggedin",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "401": {
+            "description": "Un-Authorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "DB Error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/group": {
+      "get": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Get all the groups of user",
+        "description": "",
+        "operationId": "userGroups",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfull response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Group"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Ceate a new group",
+        "description": "",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Create a new group",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "groupName": {
+                  "type": "string",
+                  "format": "string",
+                  "description": "Name of group(unique)."
+                },
+                "image": {
+                  "type": "string",
+                  "format": "base64",
+                  "description": "Image in base64 format."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "group created",
+            "schema": {
+              "$ref": "#/definitions/Group"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Fill group Name",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/group/invite": {
+      "post": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Add user to group",
+        "description": "",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Create a new group",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "group": {
+                  "type": "string",
+                  "format": "string",
+                  "description": "ID of group(unique)."
+                },
+                "email": {
+                  "type": "string",
+                  "format": "string",
+                  "description": "Email of user to be added"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user added",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "group": {
+                  "$ref": "#/definitions/Group"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Fill all the required details",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "DB Error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/group/leave": {
+      "post": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Leave the group",
+        "description": "",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Leave group",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "group": {
+                  "type": "string",
+                  "format": "string",
+                  "description": "ID of group(unique)."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user added",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "group": {
+                  "$ref": "#/definitions/Group"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Group Name is not present in request body",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "DB Error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "definitions": {
+    "Group": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "thumbnail": {
+          "type": "string",
+          "format": "string"
+        },
+        "admin": {
+          "type": "string",
+          "format": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "isAdmin": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "userid": {
+          "type": "string",
+          "format": "string"
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "string"
+        },
+        "thumbnail": {
+          "type": "string",
+          "format": "string"
+        },
+        "dob": {
+          "type": "string",
+          "format": "date"
+        },
+        "gender": {
+          "type": "string",
+          "format": "string"
+        },
+        "role": {
+          "type": "string",
+          "description": "",
+          "enum": [
+            "user",
+            "admin"
+          ]
+        },
+        "authCode": {
+          "type": "string",
+          "format": "string"
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "ApiResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  }
+}

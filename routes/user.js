@@ -40,7 +40,7 @@ router.post('/signin', (req, res, next) => {
 				    email: payload.email,
 				    name: payload.name,
 				    thumbnail: payload.picture,
-				    role: user,
+				    role: 'user',
 				    groups: [],
 				    authCode: idtoken,
 	  			}).save().then((user, err) => {
