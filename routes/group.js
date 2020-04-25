@@ -46,7 +46,7 @@ router.post('/invite', headerCheck, (req, res) => {
 		authUser(req.headers.authorization)
 			.then((user) => {
 				Group.findOne({_id: req.body.group}, (err, group) => {
-					if(err) res.status(403).json({error: err});
+					if(err) res.status(404).json({error: err});
 					if(group) {
 						if(group.admin == user._id) {
 							User.findOne({email: req.body.email}, (err, invitedUser) => {
@@ -60,6 +60,24 @@ router.post('/invite', headerCheck, (req, res) => {
 								}
 							})
 						} else res.status(401).json({messsage: 'You are not admin of this group'});
+					}
+				})
+			})
+})
+
+router.post('/leave', headerCheck, (req, res) => {
+	if(!req.body.group) res.status(403).json({messsage: 'Group Name is not present in request body'});
+	else
+		authUser(req.headers.authorization)
+			.then((user) => {
+				Group.findOne({_id: req.body.group}, (err, group) => {
+					if(err) res.status(404).json({error: err});
+					if(group) {
+						group.users = group.users.filter(u => u.email !== user.email);
+						group.save().then(updatedGroup => {
+							user.groups = user.groups.filter(g => g.id !== req.body.group);
+							user.save().then((updatedUser) => res.send({user: updatedUser}));
+						})
 					}
 				})
 			})

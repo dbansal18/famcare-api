@@ -7,6 +7,8 @@ var logger = require('morgan');
 var mongoose = require('mongoose');
 var cors = require('cors');
 const socketio = require('socket.io');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
 //import all routers
 var indexRouter = require('./routes/index');
@@ -18,6 +20,9 @@ const { getUserLocations, addUserLocation, generateLocationMessage } = require('
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users');
 
 var app = express();
+
+//Swagger api documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 /**
  * Get port from environment and store in Express.
