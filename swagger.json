@@ -215,7 +215,7 @@
           {
             "name": "body",
             "in": "body",
-            "description": "Create a new group",
+            "description": "Add user to group",
             "required": true,
             "schema": {
               "type": "object",
@@ -229,6 +229,83 @@
                   "type": "string",
                   "format": "string",
                   "description": "Email of user to be added"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user added",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "group": {
+                  "$ref": "#/definitions/Group"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Fill all the required details",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "DB Error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/group/remove": {
+      "post": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Remove user from group",
+        "description": "",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Remove user from group",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "group": {
+                  "type": "string",
+                  "format": "string",
+                  "description": "ID of group(unique)."
+                },
+                "email": {
+                  "type": "string",
+                  "format": "string",
+                  "description": "Email of user to be removed"
                 }
               }
             }
@@ -385,7 +462,11 @@
                 "type": "string"
               },
               "isAdmin": {
-                "type": "boolean"
+                "type": "boolean",
+                "enum": [
+                  true,
+                  false
+                ]
               }
             }
           }

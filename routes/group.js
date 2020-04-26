@@ -74,10 +74,41 @@ router.post('/leave', headerCheck, (req, res) => {
 					if(err) res.status(404).json({error: err});
 					if(group) {
 						group.users = group.users.filter(u => u.email !== user.email);
+						if(group.admin == user._id) {
+							if(group.users.length) {
+								group.users[0].isAdmin = 1;
+								group.admin = group.users[0].id;
+							}
+						}
 						group.save().then(updatedGroup => {
 							user.groups = user.groups.filter(g => g.id !== req.body.group);
-							user.save().then((updatedUser) => res.send({user: updatedUser}));
+							user.save().then((updatedUser) => res.send({user: updatedUser, group: updatedGroup}));
 						})
+					}
+				})
+			})
+})
+
+router.post('/remove', headerCheck, (req, res) => {
+	if(!req.body.group, !req.body.email) res.status(403).json({messsage: 'All Details are required'});
+	else
+		authUser(req.headers.authorization)
+			.then((user) => {
+				Group.findOne({_id: req.body.group}, (err, group) => {
+					if(err) res.status(404).json({error: err});
+					if(group) {
+						if(group.admin == user._id) {
+							User.findOne({email: req.body.email}, (err, removedUser) => {
+								if(err) res.status(404).json({messsage: err});
+								if(removedUser) {
+									group.users = group.users.filter(u => u.email !== req.body.email);
+									group.save().then(updatedGroup => {
+										removedUser.groups = user.groups.filter(g => g.id !== req.body.group);
+										removedUser.save().then((updatedUser) => res.send({user: updatedUser, group: updatedGroup}));
+									})
+								}
+							})
+						} else res.status(401).json({messsage: 'You are not admin of this group'});
 					}
 				})
 			})
